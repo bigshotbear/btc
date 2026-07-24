@@ -1,0 +1,27 @@
+Kalshi BTC Engine Phase 1 — Build Report
+Date: 2026-07-23
+
+Validation completed:
+- Python source compilation: passed
+- Unit tests: 8 passed
+- Kalshi RSA-PSS signature verification: passed
+- Kalshi unified YES-price order-book mapping: passed
+- Depth-weighted execution-price calculation: passed
+- Sequence-gap detection: passed
+- Kraken official CRC32 checksum fixture: passed
+- Exact 60-observation strict-above settlement arithmetic: passed
+- Quarter-hour final-minute boundary semantics: passed
+
+Not executed in this environment:
+- Live authenticated Kalshi connection (requires the user's API key/private key)
+- Live PostgreSQL migration (asyncpg is installed by Docker/Railway at deployment)
+- 24/7 Railway endurance test
+
+The repository contains no order-placement code.
+
+Render troubleshooting patch:
+- Docker startup now runs Alembic migrations before Uvicorn.
+- /healthz and /api/latest return structured JSON errors instead of plain-text 500 responses.
+- Dashboard checks HTTP status before parsing JSON and displays actionable backend errors.
+- Optional RUN_COLLECTORS_IN_API demo mode lets one web process collect Coinbase/Kraken data for temporary testing.
+- Kalshi should remain disabled until valid demo credentials are configured.
