@@ -29,7 +29,7 @@ class Settings(BaseSettings):
     coinbase_product_id: str = "BTC-USD"
     kraken_enable: bool = True
     kraken_symbol: str = "BTC/USD"
-    kraken_book_depth: Literal[10, 25, 100, 500, 1000] = 100
+    kraken_book_depth: int = 100
 
     db_batch_size: int = Field(default=500, ge=1, le=5000)
     db_flush_interval_ms: int = Field(default=250, ge=25, le=5000)
@@ -55,7 +55,21 @@ class Settings(BaseSettings):
         if self.kalshi_private_key_path:
             return self.kalshi_private_key_path.read_bytes()
         raise ValueError("Set KALSHI_PRIVATE_KEY_PATH or KALSHI_PRIVATE_KEY_PEM")
+@field_validator("kraken_book_depth", mode="before")
+@classmethod
+def normalize_kraken_book_depth(cls, value: int | str) -> int:
+    try:
+        depth = int(value)
+    except (TypeError, ValueError) as exc:
+        raise ValueError("KRAKEN_BOOK_DEPTH must be an integer") from exc
 
+    allowed = {10, 25, 100, 500, 1000}
+    if depth not in allowed:
+        raise ValueError(
+            "KRAKEN_BOOK_DEPTH must be one of 10, 25, 100, 500, or 1000"
+        )
+
+    return depth
     @field_validator("database_url")
     @classmethod
     def normalize_database_url(cls, value: str) -> str:
